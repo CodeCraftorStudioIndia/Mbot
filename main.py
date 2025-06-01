@@ -4,10 +4,8 @@ import google.generativeai as genai
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
 
-# Configure logging
 logging.basicConfig(level=logging.INFO)
 
-# Load environment variables
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
@@ -15,10 +13,8 @@ if not TELEGRAM_BOT_TOKEN or not GEMINI_API_KEY:
     logging.error("Missing TELEGRAM_BOT_TOKEN or GEMINI_API_KEY environment variables.")
     exit(1)
 
-# Configure Gemini API key
 genai.configure(api_key=GEMINI_API_KEY)
 
-# Use your specific Gemini 2.0 Flash model name
 MODEL_NAME = "models/gemini-2.0-flash-001"
 model = genai.GenerativeModel(MODEL_NAME)
 
@@ -30,9 +26,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logging.info(f"User input: {user_text}")
 
     try:
-        # Call Gemini 2.0 Flash chat method
-        response = model.chat(messages=[{"role": "user", "content": user_text}])
-        reply = response.candidates[0].content
+        response = model.generate_text(prompt=user_text)
+        reply = response.text
         logging.info(f"Gemini 2.0 Flash response: {reply}")
         await update.message.reply_text(reply)
     except Exception as e:
